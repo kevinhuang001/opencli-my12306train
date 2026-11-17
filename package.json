@@ -1,0 +1,22 @@
+{
+  "name": "opencli-plugin-my12306train",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "OpenCLI plugin for 12306 in-progress train orders",
+  "keywords": [
+    "opencli",
+    "opencli-plugin",
+    "12306",
+    "train",
+    "railway",
+    "ticket"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kevinhuang001/opencli-my12306train.git"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
