@@ -1,6 +1,6 @@
 {
   "name": "my12306train",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "12306 未出行订单查询（出发地 / 到达地 / 出发时间 / 席别 / 票价）",
   "opencli": ">=2.0.0",
   "author": "kevinhuang001",

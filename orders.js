@@ -6,7 +6,7 @@
  * 表可能包含多名旅客（后续行通过 rowspan 共用出发地 / 到达地 / 出发时间），
  * 因此解析时按表继承「行程」信息，再逐个旅客行读取席别与票价。
  *
- * 输出字段：车次、出发地、到达地、出发时间、席别、票价。
+ * 输出字段：车次、出发地、到达地、出发时间、席别、车厢座位号、票价。
  */
 import { cli, Strategy } from '@jackwener/opencli/registry';
 import { ArgumentError, AuthRequiredError, CommandExecutionError } from '@jackwener/opencli/errors';
@@ -19,6 +19,7 @@ export const ORDERS_COLUMNS = [
   'to_station',
   'departure_time',
   'seat_type',
+  'seat_no',
   'price',
 ];
 
@@ -108,8 +109,17 @@ export function readPendingOrders(maxPages) {
         if (!priceText) continue;
 
         const link = row.querySelector('a.tuipiao');
-        const seatType = clean(link?.dataset.seatTypeName)
-          || clean(seatCell.querySelector('div')?.textContent);
+        // 席位单元格通常有两个 div：席别（硬座）和车厢座位号（11车070号）。
+        const seatCells = [...seatCell.querySelectorAll(':scope > div')]
+          .map(node => clean(node.textContent))
+          .filter(Boolean);
+        const seatType = clean(link?.dataset.seatTypeName) || seatCells[0] || '';
+        let seatNo = seatCells[1] || '';
+        if (!seatNo && link) {
+          const coach = clean(link.dataset.coachNo) || clean(link.dataset.coachName);
+          const seat = clean(link.dataset.seatName) || clean(link.dataset.seatNo);
+          if (coach || seat) seatNo = (coach ? coach + '车' : '') + seat;
+        }
         const priceMatch = priceText.match(/[\d,]+(?:\.\d+)?/);
         const price = priceMatch ? priceMatch[0].replace(/,/g, '') : priceText;
 
@@ -119,6 +129,7 @@ export function readPendingOrders(maxPages) {
           to_station: trip.to,
           departure_time: trip.departure,
           seat_type: seatType,
+          seat_no: seatNo,
           price,
         });
       }
